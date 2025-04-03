@@ -15,11 +15,11 @@ const app = express(); // Initialize Express app
 
 app.use(cors({
   credentials: true,
-  origin: process.env.NETLIFY_URL || "http://localhost:5173",
+  origin: process.env.NETLIFY_URL,
 }));
 
 const sessionOptions = {
-  secret: process.env.SESSION_SECRET || "kambaz-secret",
+  secret: process.env.SESSION_SECRET ,
   resave: false,
   saveUninitialized: true,
   cookie: {}
@@ -47,7 +47,7 @@ AssignmentRoutes(app);
 SessionController(app);
 EnrollmentRoutes(app);
 // Remove duplicate route initialization
-// CourseRoutes(app);
+
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`Server running on port ${process.env.PORT || 4000}`);
