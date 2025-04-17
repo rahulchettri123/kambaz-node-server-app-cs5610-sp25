@@ -17,31 +17,56 @@ import mongoose from "mongoose";
 
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING ||"mongodb://127.0.0.1:27017/kambaz-cs5610-sp25";
 mongoose.connect(CONNECTION_STRING);
+
+// Important: CORS must be configured before session middleware
 app.use(
   cors({
     credentials: true,
-    origin: process.env.NETLIFY_URL,
+    // Accept all origins in production, or specify your Netlify domain
+    origin: process.env.NODE_ENV === "development" 
+      ? "http://localhost:5173" 
+      : [
+          "https://a6--charming-gecko-0c3626.netlify.app",
+          "https://charming-gecko-0c3626.netlify.app"
+        ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
 
+// Add proper session configuration
 const sessionOptions = {
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
-  saveUninitialized: true,
-  cookie: {},
+  saveUninitialized: false, // Changed to false to avoid creating empty sessions
+  cookie: {
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  },
 };
 
 if (process.env.NODE_ENV !== "development") {
   sessionOptions.proxy = true;
   sessionOptions.cookie = {
+    ...sessionOptions.cookie,
     sameSite: "none",
     secure: true,
-    domain: process.env.NODE_SERVER_DOMAIN,
+    // Remove domain setting as it can cause issues with cross-domain cookies
   };
 }
 
 app.use(session(sessionOptions));
 app.use(express.json());
+
+// Add middleware to debug session state
+app.use((req, res, next) => {
+  console.log("Session debug:", {
+    sessionID: req.sessionID,
+    hasCurrentUser: !!req.session.currentUser,
+    cookies: req.headers.cookie
+  });
+  next();
+});
 
 // Initialize routes
 UserRoutes(app);
