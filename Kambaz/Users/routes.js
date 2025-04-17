@@ -188,4 +188,31 @@ app.delete("/api/users/:uid/courses/:cid/enrollments", unenrollUserFromCourse);
   app.post("/api/users/signin", signin);
   app.post("/api/users/signout", signout);
   app.post("/api/users/profile", profile);
+  // Add this auth status endpoint after existing routes
+  app.get("/api/auth-status", (req, res) => {
+    try {
+      const currentUser = req.session["currentUser"];
+      
+      console.log("Auth status check:");
+      console.log("- Session ID:", req.sessionID);
+      console.log("- Current User:", currentUser ? `ID: ${currentUser._id}, Username: ${currentUser.username}` : "Not logged in");
+      console.log("- Cookies:", req.headers.cookie);
+      
+      if (currentUser) {
+        res.json({ 
+          authenticated: true, 
+          user: { 
+            _id: currentUser._id,
+            username: currentUser.username,
+            role: currentUser.role
+          }
+        });
+      } else {
+        res.json({ authenticated: false, message: "No user in session" });
+      }
+    } catch (error) {
+      console.error("Error in auth-status endpoint:", error);
+      res.status(500).json({ authenticated: false, error: error.message });
+    }
+  });
 }

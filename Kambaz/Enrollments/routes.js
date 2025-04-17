@@ -1,5 +1,5 @@
 import * as dao from "./dao.js";
-import * as courseDao from "../Courses/dao.js";
+
 export default function EnrollmentRoutes(app) {
   // Get all enrollments
   app.get("/api/enrollments", async (req, res) => {
@@ -128,21 +128,21 @@ app.post("/api/users/:uid/courses/:cid/enrollments", async (req, res) => {
   });
 
  // Get courses for a specific user
-app.get("/api/users/:uid/courses", async (req, res) => {
-  try {
-    const { uid } = req.params;
-    
-    // If uid is 'current' but we don't use session, use a fallback or error
-    if (uid === "current") {
-      return res.status(400).json({ message: "User ID required" });
-    }
-    
-    const courses = await dao.findCoursesForUser(uid);
-    res.json(courses);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
+ // app.get("/api/users/:uid/courses", async (req, res) => {
+ //   try {
+ //     const { uid } = req.params;
+ //     
+ //     // If uid is 'current' but we don't use session, use a fallback or error
+ //     if (uid === "current") {
+ //       return res.status(400).json({ message: "User ID required" });
+ //     }
+ //     
+ //     const courses = await dao.findCoursesForUser(uid);
+ //     res.json(courses);
+ //   } catch (error) {
+ //     res.status(500).json({ message: "Server error", error: error.message });
+ //   }
+ // });
 // Get users enrolled in a specific course
 app.get("/api/courses/:cid/users", async (req, res) => {
   try {

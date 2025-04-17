@@ -82,17 +82,6 @@ app.get("/api/courses", async (req, res) => {
   }
 });
 
-// For enrolling a user in a course (this should be a separate POST endpoint)
-app.post("/api/users/:uid/courses/:cid/enrollments", async (req, res) => {
-  try {
-      const { uid, cid } = req.params;
-      const enrollment = await enrollmentsDao.enrollUserInCourse(uid, cid);
-      res.json(enrollment);
-  } catch (error) {
-      res.status(500).json({ message: "Error enrolling user", error: error.message });
-  }
-});
-
   // Delete course - faculty/admin only
   app.delete("/api/courses/:courseId", isFacultyOrAdmin, async (req, res) => {
     try {
